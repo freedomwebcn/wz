@@ -1,8 +1,13 @@
 <template>
   <div>
-    <Home />
+    <RouterView />
   </div>
 </template>
+
 <script setup>
-import Home from "./views/Home/Home.vue";
+import { reqHeroData } from "@/api";
+
+reqHeroData().then((data) => {
+  window.sessionStorage.setItem('heros',JSON.stringify(data))
+});
 </script>
