@@ -12,8 +12,8 @@ export default defineConfig({
     ],
   },
   plugins: [vue()],
-  server: {
-    host: "192.168.37.4",
-    port:3344
-  },
+  // server: {
+  //   host: "192.168.37.4",
+  //   port:3344
+  // },
 });

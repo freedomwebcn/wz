@@ -23,17 +23,23 @@
         class="absolute left-0 right-0 flex h-[3.99921875em] items-center bg-[var(--bg)]"
         :style="{ opacity: opval }"
       >
-        <span class="absolute left-[2.5em] text-xl font-bold">Type</span>
+        <Transition>
+          <span
+            class="absolute left-[2.5em] text-xl font-bold"
+            v-if="opval === 1"
+            >Type</span
+          >
+        </Transition>
       </div>
     </header>
-    <div class="mx-auto mb-6 max-w-[1200px] px-3 pt-12">
+    <div class="mx-auto mb-6 max-w-5xl px-3 pt-12">
       <h2 class="mb-12 px-8 text-3xl font-bold">Type</h2>
 
       <ul
         class="grid grid-cols-[repeat(var(--column-count),minmax(0,1fr))] gap-[0.625em]"
       >
         <li
-          class="flex cursor-pointer flex-col items-center rounded-md bg-[var(--bg)] p-[0.66664em] md:px-0"
+          class="flex cursor-pointer flex-col items-center rounded-md bg-[var(--bg)] p-[0.66664em] transition-colors duration-200 ease-in md:px-0 md:hover:bg-[#282828]"
           v-for="hero in filterHerosData"
         >
           <img
@@ -71,7 +77,19 @@ window.addEventListener("scroll", function (e) {
 .list {
   --column-count: 4;
   --bg: #181818;
-  background-image: linear-gradient(rgba(83, 83, 83, 0.8), transparent 14rem);
+  background-image: linear-gradient(rgba(83, 83, 83, 0.8), transparent 13rem);
+}
+
+@media (max-width: 319px) {
+  .list {
+    --column-count: 3;
+  }
+}
+
+@media (max-width: 240px) {
+  .list {
+    --column-count: 2;
+  }
 }
 
 @media (min-width: 415px) {
@@ -93,7 +111,17 @@ window.addEventListener("scroll", function (e) {
 }
 @media (min-width: 1024px) {
   .list {
-    --column-count: 8;
+    --column-count: 9;
   }
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
 }
 </style>

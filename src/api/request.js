@@ -11,15 +11,11 @@ instance.interceptors.request.use(function (config) {
 // 添加响应拦截器
 instance.interceptors.response.use(
   function (response) {
-    // console.log(response.data);
-    if (response.data.code === 400) {
-      return Promise.reject(response.data.msg);
-    }
-    return response.data.data;
+    return response.data;
   },
   function (error) {
     console.log(error);
-    return Promise.reject(error.message);
+    return error
   },
 );
 
