@@ -5,8 +5,8 @@
       <div class="mx-auto">
         <div class="mx-3 py-4 text-white">
           <div class="flex items-center text-lg font-bold md:text-xl">
-            <h1>Good Morning</h1>
-            <div class="ml-auto hidden lg:flex">nav</div>
+            <h1>{{ getGreetingMsg() }}</h1>
+            <div class="ml-auto hidden lg:flex">{{ getDay() }}</div>
           </div>
         </div>
       </div>
@@ -29,7 +29,7 @@
       </div>
 
       <input
-        class="h-12 w-full border-0 bg-[#242424] px-8 text-lg text-white outline-0 placeholder:text-[#b3b3b3] md:h-[52px] md:rounded-[26px] md:px-9"
+        class="h-12 w-full border-0 bg-[#242424] px-8 text-lg text-white outline-0 placeholder:text-[#b3b3b3] hover:bg-[#333333] md:h-[52px] md:rounded-[26px] md:px-9"
         type="text"
         placeholder="搜索"
         @focus="focus"
@@ -44,13 +44,13 @@
   <h2
     class="mx-auto max-w-[1200px] px-3 py-4 text-xl font-bold text-white md:text-2xl lg:mb-4 xl:px-0"
   >
-    Hero Type
+    英雄职业
   </h2>
   <div
     class="column | mx-auto mb-8 grid max-w-[1200px] auto-rows-[var(--row-h)] grid-cols-[repeat(var(--column-count),minmax(0,1fr))] gap-3 px-3 text-white xl:px-0"
   >
     <a
-      class="relative cursor-pointer overflow-hidden rounded-md p-[0.78125em] lg:p-[0.88888em]"
+      class="relative cursor-pointer overflow-hidden rounded-md p-[0.78125em] after:absolute after:bottom-0 after:left-0 after:right-0 after:top-0 after:transition-colors after:duration-200 after:ease-in hover:after:bg-[rgba(0,0,0,.2)] lg:p-[0.88888em]"
       v-for="(item, index) in herosType"
       :style="`background-color:${item.bgcolor}`"
       @click="$router.push(`/heros/${index + 1}`)"
@@ -61,48 +61,52 @@
           :src="item.ico"
           alt=""
         />
-        <span class="absolute font-bold" style="font-size: var(--type-size)">{{
-          item.type
-        }}</span>
+        <span
+          class="absolute z-10 font-bold text-white"
+          style="font-size: var(--type-size)"
+          >{{ item.type }}</span
+        >
       </div>
     </a>
   </div>
-
-  <Teleport to="body">
-    <Transition>
-      <div
-        class="absolute bottom-0 left-0 right-0 top-0 bg-[rgba(0,0,0,0.1)] backdrop-blur-3xl"
-        v-show="showOverlay"
-        @click="showOverlay = false"
-      >
-        <div
-          class="absolute right-5 top-5 hidden h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-[#333333] text-white md:flex"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="1em"
-            height="2em"
-            viewBox="0 0 12 16"
-          >
-            <path
-              fill-rule="evenodd"
-              d="M7.48 8l3.75 3.75l-1.48 1.48L6 9.48l-3.75 3.75l-1.48-1.48L4.52 8L.77 4.25l1.48-1.48L6 6.52l3.75-3.75l1.48 1.48L7.48 8z"
-              fill="currentColor"
-            />
-          </svg>
-        </div>
-      </div>
-    </Transition>
-  </Teleport>
+  <Overlay v-model:show="showOverlay" />
 </template>
 
 <script setup>
 import { ref } from "vue";
+
+import Overlay from "../../components/Overlay/Overlay.vue";
 import herosType from "./herosType.json";
 
 let showOverlay = ref(false);
 
 const focus = () => (showOverlay.value = true);
+
+const getDay = () => {
+  const options = { weekday: "long" };
+  return new Intl.DateTimeFormat("en-US", options).format(new Date());
+};
+
+const getGreetingMsg = () => {
+  const hours = new Date().getHours();
+  let greeting;
+
+  switch (true) {
+    case hours > 4 && hours <= 11:
+      greeting = "Good morning";
+      break;
+    case hours > 11 && hours <= 18:
+      greeting = "Good afternoon";
+      break;
+    case hours > 18 && hours <= 23:
+      greeting = "Good evening";
+      break;
+    default:
+      greeting = "Good night";
+  }
+
+  return greeting;
+};
 </script>
 <style>
 .column {
