@@ -1,7 +1,7 @@
 <template>
-  <div class="list | text-white">
+  <div class="heros—page | text-white">
     <header class="sticky top-0 flex items-center px-3 py-4">
-      <button class="relative z-40" @click="$router.go(-1)">
+      <button class="relative z-40 md:hover:text-green-400" @click="$router.go(-1)">
         <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24">
           <g fill="none" fill-rule="evenodd">
             <path
@@ -12,19 +12,17 @@
         </svg>
       </button>
       <div class="absolute left-0 right-0 flex h-[3.99921875em] items-center bg-[var(--bg)]" :style="{ opacity: opval }">
-        <Transition>
-          <span class="absolute left-[2.5em] text-xl font-bold" v-if="opval === 1">Type</span>
-        </Transition>
+        <span class="animate-fadeIn absolute left-[2.5em] text-xl font-bold" v-if="opval === 1">Type</span>
       </div>
     </header>
     <div class="mx-auto mb-6 max-w-5xl px-3 pt-12">
-      <h2 class="mb-12 px-8 text-3xl font-bold">Type</h2>
+      <h2 class="mb-12 px-8 text-3xl font-bold">{{type}}</h2>
 
       <ul class="grid grid-cols-[repeat(var(--column-count),minmax(0,1fr))] gap-[0.625em]">
         <li
           class="flex cursor-pointer flex-col items-center rounded-md bg-[var(--bg)] p-[0.66664em] transition-colors duration-200 ease-in md:px-0 md:hover:bg-[#282828]"
           v-for="hero in filterHerosData"
-          @click="showOverlay = true"
+          @click="openOverlay(hero)"
         >
           <img class="mb-2 h-[3.7299em] rounded object-cover" :src="hero.iconUrl" />
           <span class="text-[0.9375em]">{{ hero.cname }}</span>
@@ -38,40 +36,35 @@
       <img class="absolute left-1/2 top-1/2 h-[10.078125em] w-[7.8125em] -translate-x-1/2 -translate-y-1/2 opacity-40" src="./img/01.png" alt="" />
       <div class="flex w-full items-start justify-center text-center text-[#b3b3b3]">
         <span
-          class="flex-1 cursor-pointer bg-[#1a1a1a] py-3"
-          :class="[
-            {
-              'active-tab': activeTab === index,
-            },
-            index == activeTab + 1 && 'tab-bl',
-            index == activeTab - 1 && 'tab-br',
-          ]"
-          @click="activeTab = index"
-          v-for="(tab, index) in tabs"
+          class="flex-1 cursor-pointer bg-[#1a1a1a] py-3 md:hover:text-green-500"
+          :class="[index === activeTab && 'bg-[#242424] text-white', index === activeTab + 1 && 'rounded-bl-md', index === activeTab - 1 && 'rounded-br-md']"
+          @click="getHeroPowerData(index)"
+          v-for="(item, index) in tabs"
         >
-          {{ tab }}
+          {{ item.tab }}
         </span>
       </div>
 
-      <div class="relative z-10 grid auto-rows-[3em] items-center px-4 py-5 text-[#b3b3b3]" v-if="false">
+      <div class="animate-fadeIn relative z-10 grid auto-rows-[3em] items-center px-4 pb-5 pt-3 text-[#b3b3b3]" v-if="powerData?.name">
         <div class="grid grid-cols-[2em_2fr_1fr]">
           <span>省</span>
-          <span>香港</span>
-          <span class="justify-self-end">6555分</span>
+          <span>{{ powerData.province }}</span>
+          <span class="justify-self-end">{{ powerData.provincePower }}分</span>
         </div>
         <div class="grid grid-cols-[2em_2fr_1fr]">
           <span>市</span>
-          <span>白城市</span>
-          <span class="justify-self-end">6555分</span>
+          <span>{{ powerData.city }}</span>
+          <span class="justify-self-end">{{ powerData.cityPower }}分</span>
         </div>
         <div class="grid grid-cols-[2em_2fr_1fr]">
           <span>区</span>
-          <span>萨迦县</span>
-          <span class="justify-self-end">6555分</span>
+          <span>{{ powerData.area }}</span>
+          <span class="justify-self-end">{{ powerData.areaPower }}分</span>
         </div>
-        <p class="justify-self-end">数据更新时间:2023/12/17 04:50:29</p>
+        <p class="justify-self-end">数据更新时间:{{ powerData.updatetime }}</p>
       </div>
-      <div class="loading absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-200">
+
+      <div class="loading absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-200" v-if="!powerData?.name && loadingError == null">
         <svg xmlns="http://www.w3.org/2000/svg" width="4.6em" height="4.6em" viewBox="0 0 24 24">
           <circle cx="18" cy="12" r="0" fill="currentColor">
             <animate attributeName="r" begin=".67" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
@@ -84,107 +77,136 @@
           </circle>
         </svg>
       </div>
+
+      <div class="absolute top-1/2 flex w-full -translate-y-1/2 cursor-pointer flex-col items-center gap-5 pt-11" v-if="loadingError" @click="getHeroPowerData(activeTab)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="4em" height="4em" viewBox="0 0 24 24">
+          <path
+            fill="#e11d48"
+            d="m14.436 15.497l6.283 6.284a.75.75 0 0 0 1.061-1.061L3.28 2.22a.75.75 0 1 0-1.06 1.06L5.939 7l-1.836 5.153a1.75 1.75 0 0 0 1.642 2.337l1.568.006l-1.269 5.669c-.33 1.477 1.487 2.459 2.541 1.371zm5.21-5.377l-3.122 3.222l-9.47-9.47l.37-1.041A1.25 1.25 0 0 1 8.602 2h6.453a1.25 1.25 0 0 1 1.186 1.645L14.79 8h3.958c1.104 0 1.666 1.327.898 2.12"
+          />
+        </svg>
+        <p class="text-white">数据请求失败，点击重试！</p>
+      </div>
     </div>
   </Dialog>
+
+  <Notify v-bind="notifyProps" v-model:show="showNotify" />
 </template>
 
 <script setup>
 import { computed, ref, watch } from "vue";
 import Overlay from "../../components/Overlay/Overlay.vue";
 import Dialog from "../../components/Dialog/Dialog.vue";
+import Notify from "../../components/Notify/Notify.vue";
 
-const props = defineProps(["id"]); //路由参数
-let opval = ref(0); //opacity值
-let showOverlay = ref(false);
-let activeTab = ref(0);
-let tabs = ref(["安卓QQ", "安卓WX", "苹果QQ", "苹果WX"]);
-
-const tabRounded = computed(() => {
-  return (index) => {
-    if (index === activeTab - 1 || index === activeTab + 1) {
-      console.log();
-      return `tab-${index % 2 === 0 ? 1 : 2}-${index % 2 === 0 ? "br" : "bl"} : ''`;
-    }
-  };
-});
-watch(showOverlay, (val) => {
-  document.querySelector("body").style.overflow = val ? "hidden" : "auto";
-});
+import { reqHeroPower } from "@/api/index.js";
 
 const localherosData = JSON.parse(window.sessionStorage.getItem("heros") || "[]");
+const props = defineProps(["id","type"]); //路由参数
+let opval = ref(0); //opacity值
+let showOverlay = ref(false);
+let activeTab = ref();
+let tabs = [
+  {
+    tab: "安卓QQ",
+    param: "aqq",
+  },
+  {
+    tab: "安卓WX",
+    param: "awx",
+  },
+  {
+    tab: "苹果QQ",
+    param: "iqq",
+  },
+  {
+    tab: "苹果WX",
+    param: "iwx",
+  },
+];
 
-const filterHerosData = computed(() => {
-  return localherosData.filter((item) => item.hero_type === props.id * 1);
-});
+let powerData = ref(null);
+let currentHeroName = "";
+let loadingError = ref(null); //请求战力数据状态
+let showNotify = ref(false);
+const notifyProps = ref({});
+
+const openOverlay = (currentHero) => {
+  showOverlay.value = true;
+  currentHeroName = currentHero.cname;
+  getHeroPowerData();
+};
+
+async function getHeroPowerData(index = 0) {
+  powerData.value = null;
+  activeTab.value = index;
+  loadingError.value = null;
+  const type = tabs[activeTab.value].param;
+
+  try {
+    const { code, data } = await reqHeroPower({ currentHeroName, type });
+    if (code == 200) {
+      powerData.value = data;
+      return;
+    }
+    throw new Error("战力数据请求失败");
+  } catch (err) {
+    loadingError.value = true; //请求失败
+    showNotify.value = true;
+    notifyProps.value = { type: "danger", msg: "战力数据请求失败" };
+    setTimeout(() => (showNotify.value = false), 3000);
+    console.log(err);
+  }
+}
+
+const filterHerosData = computed(() => localherosData.filter((item) => item.hero_type === props.id * 1));
+
+watch(showOverlay, (val) => (document.querySelector("body").style.overflow = val ? "hidden" : "auto"));
 
 // 监听页面滚动事件
-window.addEventListener("scroll", function (e) {
-  opval.value = Math.max(Math.min(1 - (118 - window.scrollY) / 118, 1));
-});
+window.addEventListener("scroll", (e) => (opval.value = Math.max(Math.min(1 - (118 - window.scrollY) / 118, 1))));
 </script>
 
 <style scoped>
-.list {
+.heros—page {
   --column-count: 4;
   --bg: #181818;
   background-image: linear-gradient(rgba(83, 83, 83, 0.8), transparent 13rem);
 }
 
-.active-tab {
-  background-color: #242424;
-  color: white;
-}
-
-/* 点击第二个tab时 第一个tab右下角改变radius */
-
-.tab-bl {
-  border-bottom-left-radius: 0.46875em;
-}
-.tab-br {
-  border-bottom-right-radius: 0.46875em;
-}
-
 @media (max-width: 319px) {
-  .list {
+  .heros—page {
     --column-count: 3;
   }
 }
 
 @media (max-width: 240px) {
-  .list {
+  .heros—page {
     --column-count: 2;
   }
 }
 
 @media (min-width: 415px) {
-  .list {
+  .heros—page {
     --column-count: 5;
   }
 }
 
 @media (min-width: 560px) {
-  .list {
+  .heros—page {
     --column-count: 6;
   }
 }
 
 @media (min-width: 768px) {
-  .list {
+  .heros—page {
     --column-count: 7;
   }
 }
 @media (min-width: 1024px) {
-  .list {
+  .heros—page {
     --column-count: 9;
   }
 }
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.5s ease;
-}
 
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
-}
 </style>

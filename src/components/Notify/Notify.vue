@@ -1,5 +1,5 @@
 <template>
-  <Transition>
+  <Transition name="notify">
     <div
       class="notify | absolute top-0 z-[999] flex h-14 w-full items-center justify-center text-lg text-white"
       v-if="show"
@@ -50,14 +50,14 @@ const bgcolor = computed(() => {
   --success-bg: rgb(34, 197, 94);
   --danger-bg: #ee0a24;
 }
-.v-enter-active,
-.v-leave-active {
+.notify-enter-active,
+.notify-leave-active {
   transform: translateY(0);
   transition: 0.5s ease;
 }
 
-.v-enter-from,
-.v-leave-to {
+.notify-enter-from,
+.notify-leave-to {
   opacity: 0;
   transform: translateY(-100%);
 }

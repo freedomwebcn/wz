@@ -1,6 +1,6 @@
 <template>
   <!-- bg-[rgba(0,0,0,.5)] -->
-  <div class="md:pb-20 lg:pb-28">
+  <div class="md:pb-20 lg:pb-24">
     <header>
       <div class="mx-auto">
         <div class="mx-3 py-4 text-white">
@@ -11,16 +11,12 @@
         </div>
       </div>
     </header>
-    <div class="relative z-40 mx-auto px-3 md:mt-48 md:max-w-[700px] md:px-0">
-      <div
-        class="absolute ml-2 flex h-full items-center text-[hsla(0,0%,100%,.7)] md:ml-3"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="1.2em"
-          height="1.2em"
-          viewBox="0 0 20 20"
-        >
+    <div class="hidden md:block">
+      <img class="absolute cursor-pointer left-1/2 h-[10.078125em] w-[7.8125em] -translate-x-1/2" src="/public/01.png" alt="" />
+    </div>
+    <div class="relative z-40 mx-auto px-3 md:mt-64 md:max-w-[700px] md:px-0">
+      <div class="absolute ml-2 flex h-full items-center text-[hsla(0,0%,100%,.7)] md:ml-3">
+        <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 20 20">
           <path
             fill="currentColor"
             d="M8.195 0c4.527 0 8.196 3.62 8.196 8.084a7.989 7.989 0 0 1-1.977 5.267l5.388 5.473a.686.686 0 0 1-.015.98a.71.71 0 0 1-.993-.014l-5.383-5.47a8.23 8.23 0 0 1-5.216 1.849C3.67 16.169 0 12.549 0 8.084C0 3.62 3.67 0 8.195 0Zm0 1.386c-3.75 0-6.79 2.999-6.79 6.698c0 3.7 3.04 6.699 6.79 6.699s6.791-3 6.791-6.699c0-3.7-3.04-6.698-6.79-6.698Z"
@@ -41,19 +37,13 @@
       </div> -->
     </div>
   </div>
-  <h2
-    class="mx-auto max-w-[1200px] px-3 py-4 text-xl font-bold text-white md:text-2xl lg:mb-4 xl:px-0"
-  >
-    英雄职业
-  </h2>
-  <div
-    class="column | mx-auto mb-8 grid max-w-[1200px] auto-rows-[var(--row-h)] grid-cols-[repeat(var(--column-count),minmax(0,1fr))] gap-3 px-3 text-white xl:px-0"
-  >
+  <h2 class="mx-auto max-w-[1200px] px-3 py-4 text-xl font-bold text-white md:text-2xl lg:mb-4 xl:px-0">英雄职业</h2>
+  <div class="column | mx-auto mb-8 grid max-w-[1200px] auto-rows-[var(--row-h)] grid-cols-[repeat(var(--column-count),minmax(0,1fr))] gap-3 px-3 text-white xl:px-0">
     <a
       class="relative cursor-pointer overflow-hidden rounded-md p-[0.78125em] after:absolute after:bottom-0 after:left-0 after:right-0 after:top-0 after:transition-colors after:duration-200 after:ease-in hover:after:bg-[rgba(0,0,0,.2)] lg:p-[0.88888em]"
-      v-for="(item, index) in herosType"
+      v-for="(item, index) in herotype"
       :style="`background-color:${item.bgcolor}`"
-      @click="$router.push(`/heros/${index + 1}`)"
+      @click="$router.push(`/heros/${index + 1}/${item.type}`)"
     >
       <div>
         <img
@@ -61,11 +51,7 @@
           :src="item.ico"
           alt=""
         />
-        <span
-          class="absolute z-10 font-bold text-white"
-          style="font-size: var(--type-size)"
-          >{{ item.type }}</span
-        >
+        <span class="absolute z-10 font-bold text-white" style="font-size: var(--type-size)">{{ item.type }}</span>
       </div>
     </a>
   </div>
@@ -76,7 +62,7 @@
 import { ref } from "vue";
 
 import Overlay from "../../components/Overlay/Overlay.vue";
-import herosType from "./herosType.json";
+import herotype from "./herotype.json";
 
 let showOverlay = ref(false);
 
