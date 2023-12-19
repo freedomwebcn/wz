@@ -1,6 +1,6 @@
 <template>
   <!-- bg-[rgba(0,0,0,.5)] -->
-  <div class="md:pb-20 lg:pb-24">
+  <div class="md:pb-16">
     <header>
       <div class="mx-auto">
         <div class="mx-3 py-4 text-white">
@@ -12,9 +12,43 @@
       </div>
     </header>
     <div class="hidden md:block">
-      <img class="absolute cursor-pointer left-1/2 h-[10.078125em] w-[7.8125em] -translate-x-1/2" src="/public/01.png" alt="" />
+      <img class="peer absolute left-1/2 z-10 h-[10.078125em] w-[7.8125em] -translate-x-1/2 cursor-pointer transition-opacity duration-1000 hover:opacity-20" src="/public/01.png" alt="" />
+
+      <div class="text-center font-bold text-yellow-500 opacity-0 transition-opacity duration-700 ease-linear peer-hover:opacity-100">
+        <div class="absolute flex w-full flex-row-reverse justify-center gap-1 text-sm lg:gap-2 lg:text-base xl:gap-4">
+          <p class="w-5">观自在菩萨</p>
+          <p class="w-5">行深般若波罗蜜多时</p>
+          <p class="w-5">照见五蕴皆空度一切苦厄</p>
+          <p class="w-5">舍利子色不异空空不异色</p>
+          <p class="w-5">色即是空空即是色</p>
+          <p class="w-5">受想行识亦复如是</p>
+          <p class="w-5">舍利子是诸法空相</p>
+          <p class="w-5">不生不灭不垢不净不增不减</p>
+          <p class="w-5">是故空中无色无受想行识</p>
+          <p class="w-5">无眼耳鼻舌身意</p>
+          <p class="w-5">无色声香味触法</p>
+          <p class="w-5">无眼界乃至无意识界</p>
+          <p class="w-5">无无明亦无无明尽</p>
+          <p class="w-5">乃至无老死亦无老死尽</p>
+          <p class="w-5">无苦集灭道无智亦无得</p>
+          <p class="w-5">以无所得故菩提萨埵</p>
+          <p class="w-5">依般若波罗蜜多故心无罣碍</p>
+          <p class="w-5">无罣碍故无有恐怖</p>
+          <p class="w-5">远离颠倒梦想究竟涅槃</p>
+          <p class="w-5">三世诸佛依般若波罗蜜多故</p>
+          <p class="w-5">得阿耨多罗三藐三菩提</p>
+          <p class="w-5">故知般若波罗蜜多</p>
+          <p class="w-5">是大神咒是大明咒</p>
+          <p class="w-5">是无上咒是无等等咒</p>
+          <p class="w-5">能除一切苦真实不虚</p>
+          <p class="w-5">故说般若波罗蜜多咒</p>
+          <p class="w-5">即说咒曰</p>
+          <p class="w-5">揭谛揭谛波罗揭谛</p>
+          <p class="w-5">波罗僧揭谛菩提萨婆诃</p>
+        </div>
+      </div>
     </div>
-    <div class="relative z-40 mx-auto px-3 md:mt-64 md:max-w-[700px] md:px-0">
+    <div class="relative z-40 mx-auto px-3 md:mt-72 md:max-w-[700px] md:px-0">
       <div class="absolute ml-2 flex h-full items-center text-[hsla(0,0%,100%,.7)] md:ml-3">
         <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 20 20">
           <path
@@ -38,7 +72,7 @@
     </div>
   </div>
   <h2 class="mx-auto max-w-[1200px] px-3 py-4 text-xl font-bold text-white md:text-2xl lg:mb-4 xl:px-0">英雄职业</h2>
-  <div class="column | mx-auto mb-8 grid max-w-[1200px] auto-rows-[var(--row-h)] grid-cols-[repeat(var(--column-count),minmax(0,1fr))] gap-3 px-3 text-white xl:px-0">
+  <div class="column | mx-auto mb-6 grid max-w-[1200px] auto-rows-[var(--row-h)] grid-cols-[repeat(var(--column-count),minmax(0,1fr))] gap-3 px-3 text-white xl:px-0">
     <a
       class="relative cursor-pointer overflow-hidden rounded-md p-[0.78125em] after:absolute after:bottom-0 after:left-0 after:right-0 after:top-0 after:transition-colors after:duration-200 after:ease-in hover:after:bg-[rgba(0,0,0,.2)] lg:p-[0.88888em]"
       v-for="(item, index) in herotype"
@@ -121,15 +155,5 @@ const getGreetingMsg = () => {
   .column {
     --column-count: 5;
   }
-}
-
-.v-enter-active,
-.v-leave-active {
-  transition: opacity 0.2s ease;
-}
-
-.v-enter-from,
-.v-leave-to {
-  opacity: 0;
 }
 </style>

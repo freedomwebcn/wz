@@ -9,6 +9,7 @@ export default {
           to: { opacity: 1 },
         },
       },
+
       animation: {
         fadeIn: "fadeIn 1s both",
       },
