@@ -12,13 +12,14 @@
         </svg>
       </button>
       <div class="absolute left-0 right-0 flex h-[3.99921875em] items-center bg-[var(--bg)]" :style="{ opacity: opval }">
-        <span class="animate-fadeIn absolute left-[2.5em] text-xl font-bold" v-if="opval === 1">Type</span>
+        <span class="absolute left-[2.5em] animate-fadeIn text-xl font-bold" v-if="opval === 1">Type</span>
       </div>
     </header>
     <div class="mx-auto mb-6 max-w-5xl px-3 pt-12">
-      <h2 class="mb-12 px-8 text-3xl font-bold">{{type}}</h2>
+      <h2 class="mb-12 px-8 text-3xl font-bold">{{ type }}</h2>
 
       <ul class="grid grid-cols-[repeat(var(--column-count),minmax(0,1fr))] gap-[0.625em]">
+        <!-- 展示英雄数据 -->
         <li
           class="flex cursor-pointer flex-col items-center rounded-md bg-[var(--bg)] p-[0.66664em] transition-colors duration-200 ease-in md:px-0 md:hover:bg-[#282828]"
           v-for="hero in filterHerosData"
@@ -33,19 +34,21 @@
   <Overlay v-model:show="showOverlay" blurVal="0" bg="rgba(0,0,0,0.7)" />
   <Dialog v-model:show="showOverlay">
     <div class="h-[17em] w-[18.665625em] rounded-md bg-[#242424] font-bold">
-      <img class="absolute left-1/2 top-1/2 h-[10.078125em] w-[7.8125em] -translate-x-1/2 -translate-y-1/2 opacity-40" src="./img/01.png" alt="" />
+      <img class="absolute left-1/2 top-1/2 h-[10.078125em] w-[7.8125em] -translate-x-1/2 -translate-y-1/2 opacity-40" src="/public/01.png" alt="" />
+      <!-- tab -->
       <div class="flex w-full items-start justify-center text-center text-[#b3b3b3]">
         <span
           class="flex-1 cursor-pointer bg-[#1a1a1a] py-3 md:hover:text-green-500"
-          :class="[index === activeTab && 'bg-[#242424] text-white', index === activeTab + 1 && 'rounded-bl-md', index === activeTab - 1 && 'rounded-br-md']"
+          :class="[index === activeTab && 'bg-[#242424] text-white', index === activeTab + 1 && 'rounded-bl-lg', index === activeTab - 1 && 'rounded-br-lg']"
           @click="getHeroPowerData(index)"
-          v-for="(item, index) in tabs"
+          v-for="(item, index) in types"
         >
-          {{ item.tab }}
+          {{ item.type }}
         </span>
       </div>
 
-      <div class="animate-fadeIn relative z-10 grid auto-rows-[3em] items-center px-4 pb-5 pt-3 text-[#b3b3b3]" v-if="powerData?.name">
+      <!-- 展示数据 -->
+      <div class="relative z-10 grid animate-fadeIn auto-rows-[3em] items-center px-4 pb-5 pt-3 text-white" v-if="powerData?.name">
         <div class="grid grid-cols-[2em_2fr_1fr]">
           <span>省</span>
           <span>{{ powerData.province }}</span>
@@ -64,6 +67,7 @@
         <p class="justify-self-end">数据更新时间:{{ powerData.updatetime }}</p>
       </div>
 
+      <!-- 加载中 -->
       <div class="loading absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-200" v-if="!powerData?.name && loadingError == null">
         <svg xmlns="http://www.w3.org/2000/svg" width="4.6em" height="4.6em" viewBox="0 0 24 24">
           <circle cx="18" cy="12" r="0" fill="currentColor">
@@ -77,7 +81,7 @@
           </circle>
         </svg>
       </div>
-
+      <!-- 加载失败 -->
       <div class="absolute top-1/2 flex w-full -translate-y-1/2 cursor-pointer flex-col items-center gap-5 pt-11" v-if="loadingError" @click="getHeroPowerData(activeTab)">
         <svg xmlns="http://www.w3.org/2000/svg" width="4em" height="4em" viewBox="0 0 24 24">
           <path
@@ -98,33 +102,14 @@ import { computed, ref, watch } from "vue";
 import Overlay from "../../components/Overlay/Overlay.vue";
 import Dialog from "../../components/Dialog/Dialog.vue";
 import Notify from "../../components/Notify/Notify.vue";
-
-import { reqHeroPower } from "@/api/index.js";
+import { reqHeroPower } from "@/api";
+import types from "@/assets/types.json";
 
 const localherosData = JSON.parse(window.sessionStorage.getItem("heros") || "[]");
-const props = defineProps(["id","type"]); //路由参数
+const props = defineProps(["id", "type"]); //路由参数
 let opval = ref(0); //opacity值
 let showOverlay = ref(false);
 let activeTab = ref();
-let tabs = [
-  {
-    tab: "安卓QQ",
-    param: "aqq",
-  },
-  {
-    tab: "安卓WX",
-    param: "awx",
-  },
-  {
-    tab: "苹果QQ",
-    param: "iqq",
-  },
-  {
-    tab: "苹果WX",
-    param: "iwx",
-  },
-];
-
 let powerData = ref(null);
 let currentHeroName = "";
 let loadingError = ref(null); //请求战力数据状态
@@ -141,21 +126,17 @@ async function getHeroPowerData(index = 0) {
   powerData.value = null;
   activeTab.value = index;
   loadingError.value = null;
-  const type = tabs[activeTab.value].param;
+  const type = types[activeTab.value].param;
 
   try {
     const { code, data } = await reqHeroPower({ currentHeroName, type });
-    if (code == 200) {
-      powerData.value = data;
-      return;
-    }
-    throw new Error("战力数据请求失败");
+    if (code !== 200) throw new Error("战力数据请求失败");
+    powerData.value = data;
   } catch (err) {
-    loadingError.value = true; //请求失败
-    showNotify.value = true;
+    loadingError.value = true; //请求失败--显示加载失败时的svg
+    showNotify.value = true; //显示加载失败通知
     notifyProps.value = { type: "danger", msg: "战力数据请求失败" };
     setTimeout(() => (showNotify.value = false), 3000);
-    console.log(err);
   }
 }
 
@@ -208,5 +189,4 @@ window.addEventListener("scroll", (e) => (opval.value = Math.max(Math.min(1 - (1
     --column-count: 9;
   }
 }
-
 </style>

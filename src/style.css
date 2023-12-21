@@ -3,6 +3,7 @@
 @tailwind utilities;
 :root {
   font-size: calc(1vw + 0.6em);
+  --vh:calc(100vh - var(--vh-offset, 0px));
   
 }
 

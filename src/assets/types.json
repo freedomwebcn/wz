@@ -1,0 +1,18 @@
+[
+  {
+    "type": "安卓QQ",
+    "param": "aqq"
+  },
+  {
+    "type": "安卓WX",
+    "param": "awx"
+  },
+  {
+    "type": "苹果QQ",
+    "param": "iqq"
+  },
+  {
+    "type": "苹果WX",
+    "param": "iwx"
+  }
+]
