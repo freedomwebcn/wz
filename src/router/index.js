@@ -1,8 +1,14 @@
 import { createRouter, createWebHashHistory } from "vue-router";
 
-const Home = () => import("../pages/Home/Home.vue");
-const Heros = () => import("../pages/Heros/Heros.vue");
-const Search = () => import("../pages/Search/Search.vue");
+// const Home = () => import("../pages/Home/Home.vue");
+// const Heros = () => import("../pages/Heros/Heros.vue");
+// const Search = () => import("../pages/Search/Search.vue");
+
+import Home from "../pages/Home/Home.vue";
+import Heros from "../pages/Heros/Heros.vue";
+
+import Search from "../pages/Search/Search.vue";
+
 
 const routes = [
   {

@@ -21,7 +21,7 @@
       <ul class="grid grid-cols-[repeat(var(--column-count),minmax(0,1fr))] gap-[0.625em]">
         <!-- 展示英雄数据 -->
         <li
-          class="flex cursor-pointer flex-col items-center rounded-md bg-[var(--bg)] p-[0.66664em] transition-colors duration-200 ease-in md:px-0 md:hover:bg-[#282828]"
+          class="flex cursor-pointer flex-col items-center rounded-md bg-[var(--bg)] p-[0.66664em] transition-colors duration-200 ease-in active:bg-transparent md:px-0 md:hover:bg-[#282828]"
           v-for="hero in filterHerosData"
           @click="openOverlay(hero)"
         >
@@ -33,13 +33,13 @@
   </div>
   <Overlay v-model:show="showOverlay" blurVal="0" bg="rgba(0,0,0,0.7)" />
   <Dialog v-model:show="showOverlay">
-    <div class="h-[17em] w-[18.665625em] rounded-md bg-[#242424] font-bold">
-      <img class="absolute left-1/2 top-1/2 h-[10.078125em] w-[7.8125em] -translate-x-1/2 -translate-y-1/2 opacity-40" src="/public/01.png" alt="" />
+    <div class="h-[16em] w-[80vw] rounded-md bg-[#242424] font-bold min-[414px]:w-[25em]">
+      <img class="absolute left-1/2 top-1/2 h-[10.078125em] w-[7.8125em] -translate-x-1/2 -translate-y-1/2 opacity-40" src="https://pic.imgdb.cn/item/659652a1871b83018acfd47d.png" alt="" />
       <!-- tab -->
-      <div class="flex w-full items-start justify-center text-center text-[#b3b3b3]">
+      <div class="grid grid-cols-4 text-center text-base text-[#b3b3b3]">
         <span
-          class="flex-1 cursor-pointer bg-[#1a1a1a] py-3 md:hover:text-green-500"
-          :class="[index === activeTab && 'bg-[#242424] text-white', index === activeTab + 1 && 'rounded-bl-lg', index === activeTab - 1 && 'rounded-br-lg']"
+          class="flex-1 cursor-pointer bg-[#1a1a1a] py-3 md:hover:text-green-400"
+          :class="[index === activeTab && 'bg-[#242424] text-green-600', index === activeTab + 1 && 'rounded-bl-lg', index === activeTab - 1 && 'rounded-br-lg']"
           @click="getHeroPowerData(index)"
           v-for="(item, index) in types"
         >
@@ -48,7 +48,7 @@
       </div>
 
       <!-- 展示数据 -->
-      <div class="relative z-10 grid animate-fadeIn auto-rows-[3em] items-center px-4 pb-5 pt-3 text-white" v-if="powerData?.name">
+      <div class="relative z-10 grid animate-fadeIn gap-6 px-4 pt-4 text-green-500" v-if="powerData?.name">
         <div class="grid grid-cols-[2em_2fr_1fr]">
           <span>省</span>
           <span>{{ powerData.province }}</span>
@@ -64,11 +64,11 @@
           <span>{{ powerData.area }}</span>
           <span class="justify-self-end">{{ powerData.areaPower }}分</span>
         </div>
-        <p class="justify-self-end">数据更新时间:{{ powerData.updatetime }}</p>
+        <p class="justify-self-end pb-5">数据更新时间:{{ powerData.updatetime }}</p>
       </div>
 
       <!-- 加载中 -->
-      <div class="loading absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-200" v-if="!powerData?.name && loadingError == null">
+      <div class="loading relative z-20 flex h-[calc(100%_-_2.9984375em)] items-center justify-center text-gray-200" v-if="!powerData?.name && loadingError == null">
         <svg xmlns="http://www.w3.org/2000/svg" width="4.6em" height="4.6em" viewBox="0 0 24 24">
           <circle cx="18" cy="12" r="0" fill="currentColor">
             <animate attributeName="r" begin=".67" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
@@ -82,7 +82,7 @@
         </svg>
       </div>
       <!-- 加载失败 -->
-      <div class="absolute top-1/2 flex w-full -translate-y-1/2 cursor-pointer flex-col items-center gap-5 pt-11" v-if="loadingError" @click="getHeroPowerData(activeTab)">
+      <div class="relative z-20 flex h-[calc(100%_-_2.9984375em)] cursor-pointer flex-col items-center justify-center gap-y-5" v-if="loadingError" @click="getHeroPowerData(activeTab)">
         <svg xmlns="http://www.w3.org/2000/svg" width="4em" height="4em" viewBox="0 0 24 24">
           <path
             fill="#e11d48"

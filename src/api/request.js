@@ -1,7 +1,7 @@
 import axios from "axios";
 const instance = axios.create({
   baseURL: "https://api.xxoo.team/hero/",
-  timeout: 8000,
+  timeout: 3000,
 });
 
 instance.interceptors.request.use(function (config) {
