@@ -18,7 +18,7 @@
   </Transition>
 </template>
 
-<script setup>
+<script setup lang="ts">
 defineProps(["show", "blurVal", "bg"]);
 defineEmits(["update:show"]);
 </script>

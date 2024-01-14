@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import { createRouter, createWebHashHistory, RouteRecordRaw } from "vue-router";
 
 // const Home = () => import("../pages/Home/Home.vue");
 // const Heros = () => import("../pages/Heros/Heros.vue");
@@ -6,11 +6,9 @@ import { createRouter, createWebHashHistory } from "vue-router";
 
 import Home from "../pages/Home/Home.vue";
 import Heros from "../pages/Heros/Heros.vue";
-
 import Search from "../pages/Search/Search.vue";
 
-
-const routes = [
+const routes: RouteRecordRaw[] = [
   {
     path: "/",
     redirect: {

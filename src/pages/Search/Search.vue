@@ -1,5 +1,7 @@
 <template>
-  <div class="before:fixed before:h-full before:w-full before:bg-[url('https://pic.imgdb.cn/item/65964cb5871b83018abf1870.png')] before:bg-[length:25em_20.13em] before:bg-center before:bg-no-repeat before:opacity-70">
+  <div
+    class="before:fixed before:h-full before:w-full before:bg-[url('https://pic.imgdb.cn/item/65964cb5871b83018abf1870.png')] before:bg-[length:25em_20.13em] before:bg-center before:bg-no-repeat before:opacity-70"
+  >
     <header class="flex items-center px-3 py-4 text-white">
       <button class="relative z-40 md:hover:text-green-400" @click="$router.go(-1)">
         <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24">
@@ -15,16 +17,12 @@
     <div class="mx-auto max-w-5xl text-white" style="height: calc(var(--vh) - 4em)">
       <div class="relative z-50 h-full px-3" v-if="data.length">
         <div class="grid h-full grid-rows-[2.5em_23%_23%_23%_23%]">
-          <div class="grid grid-cols-[1fr_2fr_1fr] justify-items-center border-b-[1px]">
+          <div class="hairline | relative grid grid-cols-[1fr_2fr_1fr] justify-items-center">
             <span>区服</span>
             <span>地区(省/市/区标)</span>
             <span>分数</span>
           </div>
-          <div
-            class="grid grid-cols-[1fr_2fr_1fr] items-center justify-items-center"
-            v-for="(item, index) in data"
-            :style="`border-bottom: ${index == data.length - 1 ? 'none' : '1px  solid #EBEDF0'}`"
-          >
+          <div class="relative grid grid-cols-[1fr_2fr_1fr] items-center justify-items-center" :class="` ${index != data.length - 1 && ' | hairline'}`" v-for="(item, index) in data">
             <span class="row-span-3"> {{ types[index].type }} </span>
             <span>{{ item.province }} </span>
             <span> {{ item.provincePower }}分 </span>
@@ -67,16 +65,17 @@
   <Notify v-bind="notifyProps" v-model:show="showNotify" />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from "vue";
 import { reqHeroPower } from "@/api";
 import types from "@/assets/types.json";
-import Notify from "../../components/Notify/Notify.vue";
+import Notify from "@/components/Notify/Notify.vue";
+import type { heroPowerResType } from "#/axios";
 
-const props = defineProps(["name"]);
-const data = ref([]);
-let resArr = [];
-const loadingError = ref(null);
+const props = defineProps<{ name: string }>();
+const data = ref<heroPowerResType[]>([]);
+let resArr: Promise<heroPowerResType>[] = [];
+const loadingError = ref<boolean | null>(null);
 const notifyProps = ref({});
 let showNotify = ref(false);
 
@@ -85,26 +84,36 @@ function getHeroPower() {
   resArr = [];
   types.forEach((typeObj) => {
     resArr.push(
-      new Promise((resolve, reject) => {
-        reqHeroPower({ currentHeroName: props.name, type: typeObj.param }).then((val) => {
-          const { code, data } = val;
-          if (code != 200) reject(val);
-          resolve(data);
-        });
+      new Promise(async (resolve, reject) => {
+        const { code, data, msg } = await reqHeroPower({ currentHeroName: props.name, type: typeObj.param });
+        if (code != 200) reject(msg);
+        resolve(data);
       }),
     );
   });
 
   Promise.all(resArr)
-    .then((vals) => {
-      data.value = vals;
-    })
+    .then((vals) => (data.value = vals))
     .catch((error) => {
       loadingError.value = true;
       showNotify.value = true;
-      notifyProps.value = { type: "danger", msg: `${error.msg}` };
+      notifyProps.value = { type: "danger", msg: `${error}` };
       setTimeout(() => (showNotify.value = false), 3000);
     });
 }
 getHeroPower();
 </script>
+
+<style scoped>
+.hairline::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 200%;
+  height: 200%;
+  border-bottom: 1px solid #fff;
+  transform-origin: left top;
+  transform: scale(0.5);
+}
+</style>

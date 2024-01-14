@@ -33,13 +33,13 @@
   </div>
   <Overlay v-model:show="showOverlay" blurVal="0" bg="rgba(0,0,0,0.7)" />
   <Dialog v-model:show="showOverlay">
-    <div class="h-[16em] w-[80vw] rounded-md bg-[#242424] font-bold min-[414px]:w-[25em]">
-      <img class="absolute left-1/2 top-1/2 h-[10.078125em] w-[7.8125em] -translate-x-1/2 -translate-y-1/2 opacity-40" src="https://pic.imgdb.cn/item/659652a1871b83018acfd47d.png" alt="" />
+    <div class="w-[80vw] rounded-md bg-[rgb(13,18,24)] font-bold min-[414px]:w-[25em]">
+      <img class="object-cover" src="./imgs/bg.jpg" alt="" />
       <!-- tab -->
       <div class="grid grid-cols-4 text-center text-base text-[#b3b3b3]">
         <span
-          class="flex-1 cursor-pointer bg-[#1a1a1a] py-3 md:hover:text-green-400"
-          :class="[index === activeTab && 'bg-[#242424] text-green-600', index === activeTab + 1 && 'rounded-bl-lg', index === activeTab - 1 && 'rounded-br-lg']"
+          class="flex-1 cursor-pointer py-3 md:hover:text-green-400"
+          :class="[index === activeTab && ' text-green-600', index === activeTab + 1 && 'rounded-bl-lg', index === activeTab - 1 && 'rounded-br-lg']"
           @click="getHeroPowerData(index)"
           v-for="(item, index) in types"
         >
@@ -48,7 +48,7 @@
       </div>
 
       <!-- 展示数据 -->
-      <div class="relative z-10 grid animate-fadeIn gap-6 px-4 pt-4 text-green-500" v-if="powerData?.name">
+      <div class="relative z-10 grid animate-fadeIn gap-6 px-4 pt-4 text-green-500" v-if="powerData?.province">
         <div class="grid grid-cols-[2em_2fr_1fr]">
           <span>省</span>
           <span>{{ powerData.province }}</span>
@@ -68,7 +68,7 @@
       </div>
 
       <!-- 加载中 -->
-      <div class="loading relative z-20 flex h-[calc(100%_-_2.9984375em)] items-center justify-center text-gray-200" v-if="!powerData?.name && loadingError == null">
+      <div class="loading relative z-20 flex h-[calc(100%_-_2.9984375em)] items-center justify-center text-gray-200" v-if="!powerData?.province && loadingError == null">
         <svg xmlns="http://www.w3.org/2000/svg" width="4.6em" height="4.6em" viewBox="0 0 24 24">
           <circle cx="18" cy="12" r="0" fill="currentColor">
             <animate attributeName="r" begin=".67" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
@@ -97,32 +97,34 @@
   <Notify v-bind="notifyProps" v-model:show="showNotify" />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { computed, ref, watch } from "vue";
 import Overlay from "../../components/Overlay/Overlay.vue";
 import Dialog from "../../components/Dialog/Dialog.vue";
 import Notify from "../../components/Notify/Notify.vue";
 import { reqHeroPower } from "@/api";
 import types from "@/assets/types.json";
+import type { heroPowerResType, herosResType } from "#/axios";
+type herosInfoType = { cname: string; hero_type: number; iconUrl: string };
 
-const localherosData = JSON.parse(window.sessionStorage.getItem("heros") || "[]");
+const localherosData: herosResType = JSON.parse(window.sessionStorage.getItem("heros") || "[]");
 const props = defineProps(["id", "type"]); //路由参数
 let opval = ref(0); //opacity值
 let showOverlay = ref(false);
-let activeTab = ref();
-let powerData = ref(null);
+let activeTab = ref<number>(0);
+let powerData = ref<heroPowerResType | null>();
 let currentHeroName = "";
-let loadingError = ref(null); //请求战力数据状态
+let loadingError = ref<boolean | null>(null); //请求战力数据状态
 let showNotify = ref(false);
 const notifyProps = ref({});
 
-const openOverlay = (currentHero) => {
+const openOverlay = (currentHero: herosInfoType) => {
   showOverlay.value = true;
   currentHeroName = currentHero.cname;
-  getHeroPowerData();
+  getHeroPowerData(0); //每次打开overlay都默认请求第一个tab数据
 };
 
-async function getHeroPowerData(index = 0) {
+async function getHeroPowerData(index: number) {
   powerData.value = null;
   activeTab.value = index;
   loadingError.value = null;
@@ -142,10 +144,12 @@ async function getHeroPowerData(index = 0) {
 
 const filterHerosData = computed(() => localherosData.filter((item) => item.hero_type === props.id * 1));
 
-watch(showOverlay, (val) => (document.querySelector("body").style.overflow = val ? "hidden" : "auto"));
+watch(showOverlay, (val) => {
+  document.querySelector("body")!.style.overflow = val ? "hidden" : "auto";
+});
 
 // 监听页面滚动事件
-window.addEventListener("scroll", (e) => (opval.value = Math.max(Math.min(1 - (118 - window.scrollY) / 118, 1))));
+window.addEventListener("scroll", () => (opval.value = Math.max(Math.min(1 - (118 - window.scrollY) / 118, 1))));
 </script>
 
 <style scoped>

@@ -5,7 +5,7 @@
     </div>
   </Transition>
 </template>
-<script setup>
+<script setup lang="ts">
 defineProps(["show"]);
 </script>
 <style scoped>
