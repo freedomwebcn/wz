@@ -39,16 +39,16 @@
       </div>
       <!-- tab -->
       <div
-        class="relative grid h-[2.96em] grid-cols-4 text-center text-base text-gray-50 before:absolute before:-top-full before:left-0 before:right-0 before:h-full before:bg-gradient-to-t before:from-[rgb(13,18,24)] before:to-transparent"
+        class="relative flex h-[2.96em] justify-center text-center text-base text-[#6a6a6a] before:absolute before:-top-full before:left-0 before:right-0 before:h-full before:bg-gradient-to-t before:from-[rgb(13,18,24)] before:to-transparent"
       >
-        <!-- index === activeTab + 1 && 'rounded-bl-lg', index === activeTab - 1 && 'rounded-br-lg' -->
-        <button class="relative flex-1 cursor-pointer" :class="[index === activeTab && ' text-green-500']" @click="getHeroPowerData(index)" v-for="(item, index) in types">
+        <button class="relative z-10 flex-1 cursor-pointer" :class="[index === activeTab && 'text-gray-300']" @click="getHeroPowerData(index)" v-for="(item, index) in types">
           {{ item.type }}
         </button>
+        <span class="hairline | absolute h-full w-[95%]"></span>
       </div>
 
       <!-- 展示数据 -->
-      <div class="relative z-10 grid animate-fadeIn gap-6 px-4 pt-4 text-green-500" v-if="powerData?.province">
+      <div class="relative z-10 grid animate-fadeIn gap-6 px-4 pt-4 text-gray-300" v-if="powerData?.province">
         <div class="grid grid-cols-[2em_2fr_1fr]">
           <span>省</span>
           <span>{{ powerData.province }}</span>
@@ -68,15 +68,8 @@
         <p class="justify-self-end pb-5">数据更新时间:{{ powerData.updatetime }}</p>
       </div>
 
-      <div class="grid gap-4 px-4 pt-4" v-if="!powerData?.province && loadingError == null">
-        <div class="loading | relative h-[2em] overflow-hidden rounded-2xl bg-[#333]"></div>
-        <div class="loading loading-delay_100ms | relative h-[2em] animate-[100ms] overflow-hidden rounded-2xl bg-[#333]"></div>
-        <div class="loading loading-delay_200ms | relative h-[2em] animate-[200ms] overflow-hidden rounded-2xl bg-[#333]"></div>
-        <div class="loading loading-delay_300ms | relative h-[2em] w-8/12 animate-[300ms] justify-self-end overflow-hidden rounded-2xl bg-[#333]"></div>
-      </div>
-
       <!-- 加载中 -->
-      <!-- <div class="loading relative z-20 flex h-[calc(100%_-_10.46em)] items-center justify-center text-gray-200" v-if="!powerData?.province && loadingError == null">
+      <div class="relative z-20 flex h-[calc(100%_-_10.46em)] items-center justify-center text-gray-200" v-if="!powerData?.province && loadingError == null">
         <svg xmlns="http://www.w3.org/2000/svg" width="4.6em" height="4.6em" viewBox="0 0 24 24">
           <circle cx="18" cy="12" r="0" fill="currentColor">
             <animate attributeName="r" begin=".67" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
@@ -88,7 +81,7 @@
             <animate attributeName="r" begin="0" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
           </circle>
         </svg>
-      </div> -->
+      </div>
       <!-- 加载失败 -->
       <div class="relative z-20 flex h-[calc(100%_-_10.46em)] cursor-pointer flex-col items-center justify-center gap-y-5 text-gray-500" v-if="loadingError" @click="getHeroPowerData(activeTab)">
         <svg xmlns="http://www.w3.org/2000/svg" width="4em" height="4em" viewBox="0 0 24 24">
@@ -142,7 +135,12 @@ async function getHeroPowerData(index: number) {
   try {
     const { code, data } = await reqHeroPower({ currentHeroName, type });
     if (code !== 200) throw new Error("战力数据请求失败");
-    powerData.value = data;
+    setTimeout(
+      () => {
+        powerData.value = data;
+      },
+      Math.floor(Math.random() * (2000 - 500) + 500),
+    );
   } catch (err) {
     loadingError.value = true; //请求失败--显示加载失败时的svg
     showNotify.value = true; //显示加载失败通知
@@ -168,36 +166,16 @@ window.addEventListener("scroll", () => (opval.value = Math.max(Math.min(1 - (11
   background-image: linear-gradient(rgba(83, 83, 83, 0.8), transparent 13rem);
 }
 
-.loading::before {
+.hairline::after {
   content: "";
   position: absolute;
   left: 0;
-  right: 0;
-  bottom: 0;
   top: 0;
-  transform: translateX(-100%);
-  background-image: linear-gradient(90deg, transparent, hsla(0, 0%, 100%, 0.1), transparent);
-  animation: shimmer 2s infinite;
-}
-
-.loading-delay_100ms::before {
-  animation-delay: 100ms;
-}
-.loading-delay_200ms::before {
-  animation-delay: 200ms;
-}
-.loading-delay_300ms::before {
-  animation-delay: 300ms;
-}
-
-@keyframes shimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-
-  to {
-    transform: translateX(100%);
-  }
+  width: 200%;
+  height: 200%;
+  border-bottom: 1px solid #636363;
+  transform-origin: left top;
+  transform: scale(0.5);
 }
 
 @media (max-width: 319px) {
