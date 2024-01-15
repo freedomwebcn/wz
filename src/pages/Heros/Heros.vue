@@ -34,7 +34,9 @@
   <Overlay v-model:show="showOverlay" blurVal="0" bg="rgba(0,0,0,0.7)" />
   <Dialog v-model:show="showOverlay">
     <div class="h-[23.4375em] w-[80vw] overflow-hidden rounded-md bg-[rgb(13,18,24)] font-bold min-[414px]:w-[25em]">
-      <img class="h-[7.5em] w-full object-cover" src="./imgs/bg.jpg" />
+      <div class="relative h-[7.5em] w-full" :class="[!imgloaded && 'loading']">
+        <img class="h-full w-full object-cover transition-opacity duration-500 ease-in" src="./imgs/bg.jpg" @load="imgloaded = true" :style="`opacity:${imgloaded ? 1 : 0}`" />
+      </div>
       <!-- tab -->
       <div
         class="relative grid h-[2.96em] grid-cols-4 text-center text-base text-gray-50 before:absolute before:-top-full before:left-0 before:right-0 before:h-full before:bg-gradient-to-t before:from-[rgb(13,18,24)] before:to-transparent"
@@ -62,11 +64,19 @@
           <span>{{ powerData.area }}</span>
           <span class="justify-self-end">{{ powerData.areaPower }}分</span>
         </div>
+
         <p class="justify-self-end pb-5">数据更新时间:{{ powerData.updatetime }}</p>
       </div>
 
+      <div class="grid gap-4 px-4 pt-4" v-if="!powerData?.province && loadingError == null">
+        <div class="loading | relative h-[2em] overflow-hidden rounded-2xl bg-[#333]"></div>
+        <div class="loading loading-delay_100ms | relative h-[2em] animate-[100ms] overflow-hidden rounded-2xl bg-[#333]"></div>
+        <div class="loading loading-delay_200ms | relative h-[2em] animate-[200ms] overflow-hidden rounded-2xl bg-[#333]"></div>
+        <div class="loading loading-delay_300ms | relative h-[2em] w-8/12 animate-[300ms] justify-self-end overflow-hidden rounded-2xl bg-[#333]"></div>
+      </div>
+
       <!-- 加载中 -->
-      <div class="loading relative z-20 flex h-[calc(100%_-_10.46em)] items-center justify-center text-gray-200" v-if="!powerData?.province && loadingError == null">
+      <!-- <div class="loading relative z-20 flex h-[calc(100%_-_10.46em)] items-center justify-center text-gray-200" v-if="!powerData?.province && loadingError == null">
         <svg xmlns="http://www.w3.org/2000/svg" width="4.6em" height="4.6em" viewBox="0 0 24 24">
           <circle cx="18" cy="12" r="0" fill="currentColor">
             <animate attributeName="r" begin=".67" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
@@ -78,7 +88,7 @@
             <animate attributeName="r" begin="0" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
           </circle>
         </svg>
-      </div>
+      </div> -->
       <!-- 加载失败 -->
       <div class="relative z-20 flex h-[calc(100%_-_10.46em)] cursor-pointer flex-col items-center justify-center gap-y-5 text-gray-500" v-if="loadingError" @click="getHeroPowerData(activeTab)">
         <svg xmlns="http://www.w3.org/2000/svg" width="4em" height="4em" viewBox="0 0 24 24">
@@ -115,6 +125,7 @@ let currentHeroName = "";
 let loadingError = ref<boolean | null>(null); //请求战力数据状态
 let showNotify = ref(false);
 const notifyProps = ref({});
+let imgloaded = ref(false);
 
 const openOverlay = (currentHero: herosInfoType) => {
   showOverlay.value = true;
@@ -155,6 +166,38 @@ window.addEventListener("scroll", () => (opval.value = Math.max(Math.min(1 - (11
   --column-count: 4;
   --bg: #181818;
   background-image: linear-gradient(rgba(83, 83, 83, 0.8), transparent 13rem);
+}
+
+.loading::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(90deg, transparent, hsla(0, 0%, 100%, 0.1), transparent);
+  animation: shimmer 2s infinite;
+}
+
+.loading-delay_100ms::before {
+  animation-delay: 100ms;
+}
+.loading-delay_200ms::before {
+  animation-delay: 200ms;
+}
+.loading-delay_300ms::before {
+  animation-delay: 300ms;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  to {
+    transform: translateX(100%);
+  }
 }
 
 @media (max-width: 319px) {
