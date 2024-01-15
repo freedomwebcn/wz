@@ -17,8 +17,6 @@ service.interceptors.request.use(
 // 添加响应拦截器
 service.interceptors.response.use(
   (res: AxiosResponse) => {
-    console.log(res);
-    
     return res.data;
   },
   (error: AxiosError) => {

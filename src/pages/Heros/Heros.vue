@@ -33,18 +33,16 @@
   </div>
   <Overlay v-model:show="showOverlay" blurVal="0" bg="rgba(0,0,0,0.7)" />
   <Dialog v-model:show="showOverlay">
-    <div class="w-[80vw] rounded-md bg-[rgb(13,18,24)] font-bold min-[414px]:w-[25em]">
-      <img class="object-cover" src="./imgs/bg.jpg" alt="" />
+    <div class="h-[23.4375em] w-[80vw] overflow-hidden rounded-md bg-[rgb(13,18,24)] font-bold min-[414px]:w-[25em]">
+      <img class="h-[7.5em] w-full object-cover" src="./imgs/bg.jpg" />
       <!-- tab -->
-      <div class="grid grid-cols-4 text-center text-base text-[#b3b3b3]">
-        <span
-          class="flex-1 cursor-pointer py-3 md:hover:text-green-400"
-          :class="[index === activeTab && ' text-green-600', index === activeTab + 1 && 'rounded-bl-lg', index === activeTab - 1 && 'rounded-br-lg']"
-          @click="getHeroPowerData(index)"
-          v-for="(item, index) in types"
-        >
+      <div
+        class="relative grid h-[2.96em] grid-cols-4 text-center text-base text-gray-50 before:absolute before:-top-full before:left-0 before:right-0 before:h-full before:bg-gradient-to-t before:from-[rgb(13,18,24)] before:to-transparent"
+      >
+        <!-- index === activeTab + 1 && 'rounded-bl-lg', index === activeTab - 1 && 'rounded-br-lg' -->
+        <button class="relative flex-1 cursor-pointer" :class="[index === activeTab && ' text-green-500']" @click="getHeroPowerData(index)" v-for="(item, index) in types">
           {{ item.type }}
-        </span>
+        </button>
       </div>
 
       <!-- 展示数据 -->
@@ -68,7 +66,7 @@
       </div>
 
       <!-- 加载中 -->
-      <div class="loading relative z-20 flex h-[calc(100%_-_2.9984375em)] items-center justify-center text-gray-200" v-if="!powerData?.province && loadingError == null">
+      <div class="loading relative z-20 flex h-[calc(100%_-_10.46em)] items-center justify-center text-gray-200" v-if="!powerData?.province && loadingError == null">
         <svg xmlns="http://www.w3.org/2000/svg" width="4.6em" height="4.6em" viewBox="0 0 24 24">
           <circle cx="18" cy="12" r="0" fill="currentColor">
             <animate attributeName="r" begin=".67" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
@@ -82,10 +80,10 @@
         </svg>
       </div>
       <!-- 加载失败 -->
-      <div class="relative z-20 flex h-[calc(100%_-_2.9984375em)] cursor-pointer flex-col items-center justify-center gap-y-5" v-if="loadingError" @click="getHeroPowerData(activeTab)">
+      <div class="relative z-20 flex h-[calc(100%_-_10.46em)] cursor-pointer flex-col items-center justify-center gap-y-5 text-gray-500" v-if="loadingError" @click="getHeroPowerData(activeTab)">
         <svg xmlns="http://www.w3.org/2000/svg" width="4em" height="4em" viewBox="0 0 24 24">
           <path
-            fill="#e11d48"
+            fill="currentColor"
             d="m14.436 15.497l6.283 6.284a.75.75 0 0 0 1.061-1.061L3.28 2.22a.75.75 0 1 0-1.06 1.06L5.939 7l-1.836 5.153a1.75 1.75 0 0 0 1.642 2.337l1.568.006l-1.269 5.669c-.33 1.477 1.487 2.459 2.541 1.371zm5.21-5.377l-3.122 3.222l-9.47-9.47l.37-1.041A1.25 1.25 0 0 1 8.602 2h6.453a1.25 1.25 0 0 1 1.186 1.645L14.79 8h3.958c1.104 0 1.666 1.327.898 2.12"
           />
         </svg>
@@ -104,10 +102,10 @@ import Dialog from "../../components/Dialog/Dialog.vue";
 import Notify from "../../components/Notify/Notify.vue";
 import { reqHeroPower } from "@/api";
 import types from "@/assets/types.json";
-import type { heroPowerResType, herosResType } from "#/axios";
+import type { heroPowerResType } from "#/axios";
 type herosInfoType = { cname: string; hero_type: number; iconUrl: string };
 
-const localherosData: herosResType = JSON.parse(window.sessionStorage.getItem("heros") || "[]");
+import { store } from "@/store";
 const props = defineProps(["id", "type"]); //路由参数
 let opval = ref(0); //opacity值
 let showOverlay = ref(false);
@@ -142,7 +140,7 @@ async function getHeroPowerData(index: number) {
   }
 }
 
-const filterHerosData = computed(() => localherosData.filter((item) => item.hero_type === props.id * 1));
+const filterHerosData = computed(() => store.heros.filter((item) => item.hero_type === props.id * 1));
 
 watch(showOverlay, (val) => {
   document.querySelector("body")!.style.overflow = val ? "hidden" : "auto";
