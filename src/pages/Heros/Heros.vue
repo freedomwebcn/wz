@@ -1,6 +1,6 @@
 <template>
   <div class="heros—page | text-white">
-    <header class="sticky top-0 flex items-center px-3 py-4">
+    <header class="sticky top-0 flex h-[4em] items-center px-3 py-4">
       <button class="relative z-40 md:hover:text-green-400" @click="$router.go(-1)">
         <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24">
           <g fill="none" fill-rule="evenodd">
@@ -11,8 +11,10 @@
           </g>
         </svg>
       </button>
-      <div class="absolute left-0 right-0 flex h-[3.99921875em] items-center bg-[var(--bg)]" :style="{ opacity: opval }">
-        <span class="absolute left-[2.5em] animate-fadeIn text-xl font-bold" v-if="opval === 1">Type</span>
+      <div class="absolute left-0 right-0 flex h-full items-center bg-[var(--bg)] px-[3em]" :style="{ opacity: opval }">
+        <Transition name="hero-type">
+          <span class="text-xl font-bold transition-all duration-700 ease-linear" v-if="opval === 1">{{ type }}</span>
+        </Transition>
       </div>
     </header>
     <div class="mx-auto mb-6 max-w-5xl px-3 pt-12">
@@ -31,69 +33,75 @@
       </ul>
     </div>
   </div>
-  <Overlay v-model:show="showOverlay" blurVal="0" bg="rgba(0,0,0,0.7)" />
-  <Dialog v-model:show="showOverlay">
-    <div class="h-[23.4375em] w-[80vw] overflow-hidden rounded-md bg-[rgb(13,18,24)] font-bold min-[414px]:w-[25em]">
-      <div class="relative h-[7.5em] w-full" :class="[!imgloaded && 'loading']">
-        <img class="h-full w-full object-cover transition-opacity duration-500 ease-in" src="./imgs/bg.jpg" @load="imgloaded = true" :style="`opacity:${imgloaded ? 1 : 0}`" />
-      </div>
-      <!-- tab -->
-      <div
-        class="relative flex h-[2.96em] justify-center text-center text-base text-[#6a6a6a] before:absolute before:-top-full before:left-0 before:right-0 before:h-full before:bg-gradient-to-t before:from-[rgb(13,18,24)] before:to-transparent"
-      >
-        <button class="relative z-10 flex-1 cursor-pointer" :class="[index === activeTab && 'text-gray-300']" @click="getHeroPowerData(index)" v-for="(item, index) in types">
-          {{ item.type }}
-        </button>
-        <span class="hairline | absolute h-full w-[95%]"></span>
-      </div>
-
-      <!-- 展示数据 -->
-      <div class="relative z-10 grid animate-fadeIn gap-6 px-4 pt-4 text-gray-300" v-if="powerData?.province">
-        <div class="grid grid-cols-[2em_2fr_1fr]">
-          <span>省</span>
-          <span>{{ powerData.province }}</span>
-          <span class="justify-self-end">{{ powerData.provincePower }}分</span>
-        </div>
-        <div class="grid grid-cols-[2em_2fr_1fr]">
-          <span>市</span>
-          <span>{{ powerData.city }}</span>
-          <span class="justify-self-end">{{ powerData.cityPower }}分</span>
-        </div>
-        <div class="grid grid-cols-[2em_2fr_1fr]">
-          <span>区</span>
-          <span>{{ powerData.area }}</span>
-          <span class="justify-self-end">{{ powerData.areaPower }}分</span>
-        </div>
-
-        <p class="justify-self-end pb-5">数据更新时间:{{ powerData.updatetime }}</p>
-      </div>
-
-      <!-- 加载中 -->
-      <div class="relative z-20 flex h-[calc(100%_-_10.46em)] items-center justify-center text-gray-200" v-if="!powerData?.province && loadingError == null">
-        <svg xmlns="http://www.w3.org/2000/svg" width="4.6em" height="4.6em" viewBox="0 0 24 24">
-          <circle cx="18" cy="12" r="0" fill="currentColor">
-            <animate attributeName="r" begin=".67" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
-          </circle>
-          <circle cx="12" cy="12" r="0" fill="currentColor">
-            <animate attributeName="r" begin=".33" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
-          </circle>
-          <circle cx="6" cy="12" r="0" fill="currentColor">
-            <animate attributeName="r" begin="0" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
-          </circle>
-        </svg>
-      </div>
-      <!-- 加载失败 -->
-      <div class="relative z-20 flex h-[calc(100%_-_10.46em)] cursor-pointer flex-col items-center justify-center gap-y-5 text-gray-500" v-if="loadingError" @click="getHeroPowerData(activeTab)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="4em" height="4em" viewBox="0 0 24 24">
-          <path
-            fill="currentColor"
-            d="m14.436 15.497l6.283 6.284a.75.75 0 0 0 1.061-1.061L3.28 2.22a.75.75 0 1 0-1.06 1.06L5.939 7l-1.836 5.153a1.75 1.75 0 0 0 1.642 2.337l1.568.006l-1.269 5.669c-.33 1.477 1.487 2.459 2.541 1.371zm5.21-5.377l-3.122 3.222l-9.47-9.47l.37-1.041A1.25 1.25 0 0 1 8.602 2h6.453a1.25 1.25 0 0 1 1.186 1.645L14.79 8h3.958c1.104 0 1.666 1.327.898 2.12"
+  <Overlay v-model:show="showOverlay" blurVal="0" bg="rgba(0,0,0,0.7)" :isShowBtn="false">
+    <Dialog>
+      <div class="h-[23.4375em] w-[80vw] overflow-hidden rounded-md bg-[rgb(13,18,24)] font-bold min-[414px]:w-[25em]">
+        <div class="relative h-[7.5em] w-full bg-[#333]" :class="[!imgloaded && 'loading']">
+          <img
+            class="h-full w-full object-cover transition-opacity duration-500 ease-in"
+            src="https://pic.imgdb.cn/item/65a5e68a871b83018a4111d1.jpg"
+            @load="imgloaded = true"
+            :style="`opacity:${imgloaded ? 1 : 0}`"
           />
-        </svg>
-        <p class="text-white">数据请求失败，点击重试！</p>
+        </div>
+        <!-- tab -->
+        <div
+          class="relative flex h-[2.96em] justify-center text-base text-[#6a6a6a] before:absolute before:-top-full before:left-0 before:right-0 before:h-full before:bg-gradient-to-t before:from-[rgb(13,18,24)] before:to-transparent"
+        >
+          <button class="relative z-10 flex-1 cursor-pointer" :class="[index === activeTab && 'text-gray-300']" @click="getHeroPowerData(index)" v-for="(item, index) in types">
+            {{ item.type }}
+          </button>
+          <span class="hairline | absolute h-full w-[95%]"></span>
+        </div>
+
+        <!-- 展示数据 -->
+        <div class="relative z-10 grid animate-fadeIn gap-6 px-4 pt-4 text-gray-300" v-if="powerData?.province">
+          <div class="grid grid-cols-[2em_2fr_1fr]">
+            <span>省</span>
+            <span>{{ powerData.province }}</span>
+            <span class="justify-self-end">{{ powerData.provincePower }}分</span>
+          </div>
+          <div class="grid grid-cols-[2em_2fr_1fr]">
+            <span>市</span>
+            <span>{{ powerData.city }}</span>
+            <span class="justify-self-end">{{ powerData.cityPower }}分</span>
+          </div>
+          <div class="grid grid-cols-[2em_2fr_1fr]">
+            <span>区</span>
+            <span>{{ powerData.area }}</span>
+            <span class="justify-self-end">{{ powerData.areaPower }}分</span>
+          </div>
+
+          <p class="justify-self-end pb-5">数据更新时间:{{ powerData.updatetime }}</p>
+        </div>
+
+        <!-- 加载中 -->
+        <div class="relative z-20 flex h-[calc(100%_-_10.46em)] items-center justify-center text-gray-200" v-if="!powerData?.province && loadingError == null">
+          <svg xmlns="http://www.w3.org/2000/svg" width="4.6em" height="4.6em" viewBox="0 0 24 24">
+            <circle cx="18" cy="12" r="0" fill="currentColor">
+              <animate attributeName="r" begin=".67" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
+            </circle>
+            <circle cx="12" cy="12" r="0" fill="currentColor">
+              <animate attributeName="r" begin=".33" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
+            </circle>
+            <circle cx="6" cy="12" r="0" fill="currentColor">
+              <animate attributeName="r" begin="0" calcMode="spline" dur="1.5s" keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0" />
+            </circle>
+          </svg>
+        </div>
+        <!-- 加载失败 -->
+        <div class="relative z-20 flex h-[calc(100%_-_10.46em)] cursor-pointer flex-col items-center justify-center gap-y-5 text-gray-500" v-if="loadingError" @click="getHeroPowerData(activeTab)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="4em" height="4em" viewBox="0 0 24 24">
+            <path
+              fill="currentColor"
+              d="m14.436 15.497l6.283 6.284a.75.75 0 0 0 1.061-1.061L3.28 2.22a.75.75 0 1 0-1.06 1.06L5.939 7l-1.836 5.153a1.75 1.75 0 0 0 1.642 2.337l1.568.006l-1.269 5.669c-.33 1.477 1.487 2.459 2.541 1.371zm5.21-5.377l-3.122 3.222l-9.47-9.47l.37-1.041A1.25 1.25 0 0 1 8.602 2h6.453a1.25 1.25 0 0 1 1.186 1.645L14.79 8h3.958c1.104 0 1.666 1.327.898 2.12"
+            />
+          </svg>
+          <p class="text-white">数据请求失败，点击重试！</p>
+        </div>
       </div>
-    </div>
-  </Dialog>
+    </Dialog>
+  </Overlay>
 
   <Notify v-bind="notifyProps" v-model:show="showNotify" />
 </template>
@@ -151,12 +159,11 @@ async function getHeroPowerData(index: number) {
 
 const filterHerosData = computed(() => store.heros.filter((item) => item.hero_type === props.id * 1));
 
-watch(showOverlay, (val) => {
-  document.querySelector("body")!.style.overflow = val ? "hidden" : "auto";
-});
+// 查询战力模态框显示时 禁止页面滚动
+watch(showOverlay, (val) => (document.querySelector("body")!.style.overflow = val ? "hidden" : "auto"));
 
 // 监听页面滚动事件
-window.addEventListener("scroll", () => (opval.value = Math.max(Math.min(1 - (118 - window.scrollY) / 118, 1))));
+window.addEventListener("scroll", () => (opval.value = Math.min(1 - (114 - window.scrollY) / 114, 1)));
 </script>
 
 <style scoped>
@@ -176,6 +183,26 @@ window.addEventListener("scroll", () => (opval.value = Math.max(Math.min(1 - (11
   border-bottom: 1px solid #636363;
   transform-origin: left top;
   transform: scale(0.5);
+}
+.loading::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(90deg, transparent, hsla(0, 0%, 100%, 0.1), transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
 }
 
 @media (max-width: 319px) {
@@ -211,5 +238,15 @@ window.addEventListener("scroll", () => (opval.value = Math.max(Math.min(1 - (11
   .heros—page {
     --column-count: 9;
   }
+}
+
+.hero-type-enter-active,
+.hero-type-leave-active {
+  transition: opacity 0.6s linear;
+}
+
+.hero-type-enter-from,
+.hero-type-leave-to {
+  opacity: 0;
 }
 </style>

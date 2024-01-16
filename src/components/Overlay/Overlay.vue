@@ -7,7 +7,10 @@
       v-if="show"
       @click="$emit('update:show', false)"
     >
-      <button class="absolute right-5 top-5 hidden h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-[#333333] text-black active:scale-90 md:flex md:hover:text-white">
+      <button
+        class="absolute right-5 top-5 hidden h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-[#333333] text-black active:scale-90 md:flex md:hover:text-white"
+        v-if="isShowBtn"
+      >
         <svg xmlns="http://www.w3.org/2000/svg" width="1.1em" height="2em" viewBox="0 0 12 16">
           <path fill-rule="evenodd" d="M7.48 8l3.75 3.75l-1.48 1.48L6 9.48l-3.75 3.75l-1.48-1.48L4.52 8L.77 4.25l1.48-1.48L6 6.52l3.75-3.75l1.48 1.48L7.48 8z" fill="currentColor" />
         </svg>
@@ -19,7 +22,17 @@
 </template>
 
 <script setup lang="ts">
-defineProps(["show", "blurVal", "bg"]);
+interface Props {
+  show: boolean;
+  blurVal?: string;
+  bg?: string;
+  isShowBtn?: boolean;
+}
+
+withDefaults(defineProps<Props>(), {
+  isShowBtn: true,
+});
+
 defineEmits(["update:show"]);
 </script>
 <style scoped>

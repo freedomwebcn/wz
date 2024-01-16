@@ -92,48 +92,50 @@
     </div>
 
     <Overlay v-model:show="showOverlay">
-      <!-- 搜索 -->
-      <div class="relative z-50 mx-auto mt-4 px-3 md:mt-[calc(20rem_+_72px)] md:max-w-[700px] md:px-0" @click.stop>
-        <div class="absolute ml-2 flex h-full items-center text-[hsla(0,0%,100%,.7)] md:ml-3">
-          <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 20 20">
-            <path
-              fill="currentColor"
-              d="M8.195 0c4.527 0 8.196 3.62 8.196 8.084a7.989 7.989 0 0 1-1.977 5.267l5.388 5.473a.686.686 0 0 1-.015.98a.71.71 0 0 1-.993-.014l-5.383-5.47a8.23 8.23 0 0 1-5.216 1.849C3.67 16.169 0 12.549 0 8.084C0 3.62 3.67 0 8.195 0Zm0 1.386c-3.75 0-6.79 2.999-6.79 6.698c0 3.7 3.04 6.699 6.79 6.699s6.791-3 6.791-6.699c0-3.7-3.04-6.698-6.79-6.698Z"
-            />
-          </svg>
+      <div class="mx-auto md:mt-[calc(20rem_+_72px)] md:max-w-[700px]" @click.stop>
+        <!-- 搜索 -->
+        <div class="relative mt-4 px-3 md:mt-0 md:px-0">
+          <div class="absolute ml-2 flex h-full items-center text-[hsla(0,0%,100%,.7)] md:ml-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1.2em" height="1.2em" viewBox="0 0 20 20">
+              <path
+                fill="currentColor"
+                d="M8.195 0c4.527 0 8.196 3.62 8.196 8.084a7.989 7.989 0 0 1-1.977 5.267l5.388 5.473a.686.686 0 0 1-.015.98a.71.71 0 0 1-.993-.014l-5.383-5.47a8.23 8.23 0 0 1-5.216 1.849C3.67 16.169 0 12.549 0 8.084C0 3.62 3.67 0 8.195 0Zm0 1.386c-3.75 0-6.79 2.999-6.79 6.698c0 3.7 3.04 6.699 6.79 6.699s6.791-3 6.791-6.699c0-3.7-3.04-6.698-6.79-6.698Z"
+              />
+            </svg>
+          </div>
+
+          <input
+            class="h-12 w-full border-0 bg-[#242424] px-9 text-lg text-white outline-0 placeholder:text-[#b3b3b3] md:h-[52px] md:rounded-[26px] md:px-10"
+            type="text"
+            placeholder="搜索"
+            v-model.trim="keyword"
+            ref="overlayInputRef"
+          />
         </div>
 
-        <input
-          class="h-12 w-full border-0 bg-[#242424] px-9 text-lg text-white outline-0 placeholder:text-[#b3b3b3] md:h-[52px] md:rounded-[26px] md:px-10"
-          type="text"
-          placeholder="搜索"
-          v-model.trim="keyword"
-          ref="overlayInputRef"
-        />
-      </div>
-
-      <!-- 查询结果 -->
-      <div class="mx-auto py-3 md:max-w-[700px]" @click.stop v-if="filterDataBySearchKeyword.length">
-        <div class="px-3 md:px-0">
-          <div class="flex flex-col gap-y-4 rounded-xl bg-slate-50 py-4">
-            <div
-              v-for="(item, index) in filterDataBySearchKeyword"
-              class="group flex cursor-pointer items-center gap-x-3 px-6 hover:bg-[rgba(52,167,255,.07)]"
-              @click="$router.push(`search/${item.cname}`)"
-              :style="`background:${index == activeIndex ? 'linear-gradient(90deg,#edeeef,transparent)' : ''};
+        <!-- 查询结果 -->
+        <div class="py-3" v-if="filterDataBySearchKeyword.length">
+          <div class="px-3 md:px-0">
+            <div class="flex flex-col gap-y-4 rounded-xl bg-slate-50 py-4">
+              <div
+                v-for="(item, index) in filterDataBySearchKeyword"
+                class="group flex cursor-pointer items-center gap-x-3 px-6 hover:bg-[rgba(52,167,255,.07)]"
+                @click="$router.push(`search/${item.cname}`)"
+                :style="`background:${index == activeIndex ? 'linear-gradient(90deg,#edeeef,transparent)' : ''};
             `"
-            >
-              <img :src="item.iconUrl" class="h-[3em] rounded-md object-cover" alt="" />
-              <span class="text-lg text-[#858c96] group-hover:text-black" :style="`color:${index == activeIndex ? '#0d141e' : ''}`">
-                {{ item.cname }}
-              </span>
+              >
+                <img :src="item.iconUrl" class="h-[3em] rounded-md object-cover" alt="" />
+                <span class="text-lg text-[#858c96] group-hover:text-black" :style="`color:${index == activeIndex ? '#0d141e' : ''}`">
+                  {{ item.cname }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <!-- 未查询到结果 -->
-      <div class="relative z-40 mx-auto mt-32 w-full text-white md:max-w-[700px]" v-if="!filterDataBySearchKeyword.length && keyword" @click.stop>
-        <div class="px-3 text-center md:px-0">没有搜到相关英雄</div>
+        <!-- 未查询到结果 -->
+        <div class="mt-32 w-full text-white" v-if="!filterDataBySearchKeyword.length && keyword">
+          <div class="px-3 text-center md:px-0">没有搜到相关英雄</div>
+        </div>
       </div>
     </Overlay>
   </div>
