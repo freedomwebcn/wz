@@ -3,7 +3,7 @@
     class="before:fixed before:h-full before:w-full before:bg-[url('https://pic.imgdb.cn/item/65964cb5871b83018abf1870.png')] before:bg-[length:25em_20.13em] before:bg-center before:bg-no-repeat before:opacity-70"
   >
     <header class="flex items-center px-3 py-4 text-white">
-      <button class="relative z-40 md:hover:text-green-400" @click="$router.go(-1)">
+      <button class="relative z-40 md:hover:text-green-400" @click="$router.replace('/home')">
         <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24">
           <g fill="none" fill-rule="evenodd">
             <path
@@ -68,7 +68,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { reqHeroPower } from "@/api";
-import types from "@/assets/types.json";
+import types from "@/assets/gameTypes.json";
 import Notify from "@/components/Notify/Notify.vue";
 import type { heroPowerResType } from "#/axios";
 
@@ -105,7 +105,7 @@ getHeroPower();
 </script>
 
 <style scoped>
-.hairline::before {
+.hairline::after {
   content: "";
   position: absolute;
   left: 0;

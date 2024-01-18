@@ -1,7 +1,7 @@
 <template>
   <div class="heros—page | text-white">
     <header class="sticky top-0 flex h-[4em] items-center px-3 py-4">
-      <button class="relative z-40 md:hover:text-green-400" @click="$router.go(-1)">
+      <button class="relative z-40 md:hover:text-green-400" @click="$router.replace('/home')">
         <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24">
           <g fill="none" fill-rule="evenodd">
             <path
@@ -18,7 +18,7 @@
       </div>
     </header>
     <div class="mx-auto mb-6 max-w-5xl px-3 pt-12">
-      <h2 class="mb-12 px-8 text-3xl font-bold">{{ type }}</h2>
+      <h2 class="mb-12 px-8 text-3xl font-bold" ref="heroTypeRef">{{ type }}</h2>
 
       <ul class="grid grid-cols-[repeat(var(--column-count),minmax(0,1fr))] gap-[0.625em]">
         <!-- 展示英雄数据 -->
@@ -72,7 +72,7 @@
             <span class="justify-self-end">{{ powerData.areaPower }}分</span>
           </div>
 
-          <p class="justify-self-end pb-5">数据更新时间:{{ powerData.updatetime }}</p>
+          <p class="justify-self-end">数据更新时间:{{ powerData.updatetime }}</p>
         </div>
 
         <!-- 加载中 -->
@@ -92,12 +92,13 @@
         <!-- 加载失败 -->
         <div class="relative z-20 flex h-[calc(100%_-_10.46em)] cursor-pointer flex-col items-center justify-center gap-y-5 text-gray-500" v-if="loadingError" @click="getHeroPowerData(activeTab)">
           <svg xmlns="http://www.w3.org/2000/svg" width="4em" height="4em" viewBox="0 0 24 24">
+            <path fill="#e11d48" d="M11.001 10h2v5h-2zM11 16h2v2h-2z" />
             <path
-              fill="currentColor"
-              d="m14.436 15.497l6.283 6.284a.75.75 0 0 0 1.061-1.061L3.28 2.22a.75.75 0 1 0-1.06 1.06L5.939 7l-1.836 5.153a1.75 1.75 0 0 0 1.642 2.337l1.568.006l-1.269 5.669c-.33 1.477 1.487 2.459 2.541 1.371zm5.21-5.377l-3.122 3.222l-9.47-9.47l.37-1.041A1.25 1.25 0 0 1 8.602 2h6.453a1.25 1.25 0 0 1 1.186 1.645L14.79 8h3.958c1.104 0 1.666 1.327.898 2.12"
+              fill="#e11d48"
+              d="M13.768 4.2C13.42 3.545 12.742 3.138 12 3.138s-1.42.407-1.768 1.063L2.894 18.064a1.986 1.986 0 0 0 .054 1.968A1.984 1.984 0 0 0 4.661 21h14.678c.708 0 1.349-.362 1.714-.968a1.989 1.989 0 0 0 .054-1.968zM4.661 19L12 5.137L19.344 19z"
             />
           </svg>
-          <p class="text-white">数据请求失败，点击重试！</p>
+          <p class="text-white">数据请求失败，点击重试 !</p>
         </div>
       </div>
     </Dialog>
@@ -107,16 +108,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
 import Overlay from "../../components/Overlay/Overlay.vue";
 import Dialog from "../../components/Dialog/Dialog.vue";
 import Notify from "../../components/Notify/Notify.vue";
 import { reqHeroPower } from "@/api";
-import types from "@/assets/types.json";
+import types from "@/assets/gameTypes.json";
 import type { heroPowerResType } from "#/axios";
+import { store } from "@/store";
 type herosInfoType = { cname: string; hero_type: number; iconUrl: string };
 
-import { store } from "@/store";
 const props = defineProps(["id", "type"]); //路由参数
 let opval = ref(0); //opacity值
 let showOverlay = ref(false);
@@ -127,6 +128,7 @@ let loadingError = ref<boolean | null>(null); //请求战力数据状态
 let showNotify = ref(false);
 const notifyProps = ref({});
 let imgloaded = ref(false);
+const heroTypeRef = ref<HTMLElement | null>(null);
 
 const openOverlay = (currentHero: herosInfoType) => {
   showOverlay.value = true;
@@ -143,12 +145,7 @@ async function getHeroPowerData(index: number) {
   try {
     const { code, data } = await reqHeroPower({ currentHeroName, type });
     if (code !== 200) throw new Error("战力数据请求失败");
-    setTimeout(
-      () => {
-        powerData.value = data;
-      },
-      Math.floor(Math.random() * (2000 - 500) + 500),
-    );
+    setTimeout(() => (powerData.value = data), getRandomInt(500, 1000));
   } catch (err) {
     loadingError.value = true; //请求失败--显示加载失败时的svg
     showNotify.value = true; //显示加载失败通知
@@ -157,13 +154,39 @@ async function getHeroPowerData(index: number) {
   }
 }
 
+const getRandomInt = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+
 const filterHerosData = computed(() => store.heros.filter((item) => item.hero_type === props.id * 1));
 
 // 查询战力模态框显示时 禁止页面滚动
 watch(showOverlay, (val) => (document.querySelector("body")!.style.overflow = val ? "hidden" : "auto"));
 
+function throttle(fn: () => void, delay: number) {
+  let timer: NodeJS.Timeout | null = null;
+  return function () {
+    if (timer === null) {
+      fn();
+      timer = setTimeout(() => {
+        timer = null;
+      }, delay);
+    }
+  };
+}
+
+let totalDistance: number;
+const getPos = throttle(() => {
+  const CH = heroTypeRef.value?.clientHeight ?? 0;
+  const OT = heroTypeRef.value?.offsetTop ?? 0;
+  totalDistance = CH + OT;
+}, 500);
+
+window.addEventListener("resize", getPos);
+onMounted(() => getPos());
+
 // 监听页面滚动事件
-window.addEventListener("scroll", () => (opval.value = Math.min(1 - (114 - window.scrollY) / 114, 1)));
+window.addEventListener("scroll", () => {
+  opval.value = Math.min(Math.abs(window.scrollY) / totalDistance, 1); // Math.abs(window.scrollY) / TOTALDISTANCE: 获取页面滚动距离相对于指定元素的比例
+});
 </script>
 
 <style scoped>

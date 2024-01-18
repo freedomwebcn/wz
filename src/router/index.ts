@@ -17,7 +17,7 @@ const routes: RouteRecordRaw[] = [
   },
 
   {
-    path: "/Home",
+    path: "/home",
     name: "Home",
     component: Home,
   },

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="mx-auto max-w-[1920px]">
     <router-view v-slot="{ Component }">
       <keep-alive include="Home">
         <component :is="Component" />

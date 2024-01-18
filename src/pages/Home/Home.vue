@@ -6,7 +6,7 @@
         <div class="mx-3 h-full text-white">
           <div class="flex h-full items-center text-lg font-bold md:text-xl">
             <h1>{{ getGreetingMsg() }}</h1>
-            <div class="ml-auto hidden lg:flex">{{ getDay() }}</div>
+            <div class="ml-auto hidden md:flex">{{ getDay() }}</div>
           </div>
         </div>
       </header>
@@ -178,7 +178,7 @@ watch(
 
 onDeactivated(() => (showOverlay.value = false));
 
-function handleKeyboardNavigation(n?: number) {
+function handleKeyboardNavigation(n: number | KeyboardEvent) {
   let len = filterDataBySearchKeyword.value.length;
   if (!len) return;
   if (n == -1) {
@@ -195,7 +195,7 @@ function search() {
 }
 
 const getDay = () => {
-  const options = { weekday: "long" };
+  const options: Intl.DateTimeFormatOptions = { weekday: "long" };
   return new Intl.DateTimeFormat("en-US", options).format(new Date());
 };
 
@@ -205,16 +205,16 @@ const getGreetingMsg = () => {
 
   switch (true) {
     case hours > 4 && hours <= 11:
-      greeting = "Good morning";
+      greeting = "Good Morning";
       break;
     case hours > 11 && hours <= 18:
-      greeting = "Good afternoon";
+      greeting = "Good Afternoon";
       break;
     case hours > 18 && hours <= 23:
-      greeting = "Good evening";
+      greeting = "Good Evening";
       break;
     default:
-      greeting = "Good night";
+      greeting = "Good Night";
   }
 
   return greeting;
