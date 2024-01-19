@@ -183,10 +183,8 @@ const getPos = throttle(() => {
 window.addEventListener("resize", getPos);
 onMounted(() => getPos());
 
-// 监听页面滚动事件
-window.addEventListener("scroll", () => {
-  opval.value = Math.min(Math.abs(window.scrollY) / totalDistance, 1); // Math.abs(window.scrollY) / TOTALDISTANCE: 获取页面滚动距离相对于指定元素的比例
-});
+// Math.abs(window.scrollY) / totalDistance: 获取页面滚动距离与指定元素距离页面顶部 + 自身高度的比例
+window.addEventListener("scroll", () => (opval.value = Math.min(Math.abs(window.scrollY) / totalDistance, 1)));
 </script>
 
 <style scoped>
